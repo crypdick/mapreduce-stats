@@ -23,12 +23,17 @@ Note: For some of these problems, it may be helpful to run multiple map-reduce j
 2. Calculate the variance in electricity prices among the states.
 
 3. Use linear regression to fit the following simple model
+
 Population = Area * <alpha> + <beta>
+  
 That is, find <alpha> and <beta> that minimize the squared residuals when the state data is represented using this model
 
 4. Which of the following linear models is a better fit for the electricity data
+
   Electricity Price = Area * <alpha> + <beta>
+  
 Or
+
   Electricity Price = Population * <alpha> + <beta>
 
 5. Obtain a random sample of approximately 100 colleges, in which each college is equally likely to appear in the sample.
