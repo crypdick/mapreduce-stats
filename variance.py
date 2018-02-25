@@ -1,73 +1,36 @@
-# 1. Calculate the largest, smallest, and average (mean) population for a state.
-# Calculate the largest, smallest, and average (mean) area for a state.
+# 2. Calculate the variance in electricity prices among the states.
 from mrjob.job import MRJob
 
 
-class MinMaxMeanPopulation(MRJob):
+class VarianceElectricityCost(MRJob):
     '''
     Run with:
-    python min_max_mean.py < Data/states.csv
+    python variance.py < Data/Electricity.csv
+
+    Variance formula is E[X^2] - E[X]^2
 
     Output:
-   "Smallest, largest, and average population of states: "	[453588, 248691873, 9565245.115384616]
+    "Variance"	6.514557862360633
     '''
     def mapper(self, _, line):
-        words = line.split(',')
-        # State data is Name, Abbreviation, Area (Sq. Miles), Population
-        try:
-            yield ('Populations', int(words[-1]))
-        except ValueError:  # some empty fields
-            pass
+        _, cost = line.split(',')
+        # Electricity : State, Price per Kilowatt Hour
+        #try:
+        yield ('Cost', float(cost))
+        #except ValueError:  # some empty fields
+         #   pass
 
     def reducer(self, key, values):
-        smallest = 100000000000000
-        largest = 0
-        n_states = 0
-        total_population = 0
+        n = 0
+        sum_x_squared = 0
+        sum_x = 0
         for v in values:
-            if v < smallest:
-                smallest = v
-            if v > largest:
-                largest = v
-            total_population += v
-            n_states += 1
-        yield ("Smallest, largest, and average population of states: ",
-               (smallest, largest, total_population / n_states))
+            n += 1
+            sum_x += v
+            sum_x_squared += v**2
 
-
-class MinMaxMeanArea(MRJob):
-    '''
-    Run with:
-    python min_max_mean.py < Data/states.csv
-
-    Output:
-   "Smallest, largest, and average area of states: "  [68, 3787316, 145666.0]
-    '''
-    def mapper(self, _, line):
-        words = line.split(',')
-        # State data is Name, Abbreviation, Area (Sq. Miles), Population
-        try:
-            yield ('Area', int(words[-2]))
-        except ValueError:  # some empty fields
-            pass
-
-    def reducer(self, key, values):
-        smallest = 100000000000000
-        largest = 0
-        n_states = 0
-        total_area = 0
-        for v in values:
-            if v < smallest:
-                smallest = v
-            if v > largest:
-                largest = v
-            total_area += v
-            n_states += 1
-        yield ("Smallest, largest, and average area of states: ",
-               (smallest, largest, total_area / n_states))
-
+        variance = sum_x_squared/n - (sum_x/n)**2
+        yield ("Variance", variance)
 
 if __name__ == '__main__':
-    #MinMaxMeanPopulation.run()
-    # TODO: figure out how to reuse same class but specify different index in list
-    MinMaxMeanArea.run()
+    VarianceElectricityCost.run()
