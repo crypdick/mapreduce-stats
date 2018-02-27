@@ -29,7 +29,7 @@ class VarianceElectricityCost(MRJob):
             sum_x += v
             sum_x_squared += v**2
 
-        variance = sum_x_squared/n - (sum_x/n)**2
+        variance = sum_x_squared/n - (sum_x/n)**2 #TODO n should be squared for (E[x])^2
         yield ("Variance", variance)
 
 if __name__ == '__main__':
