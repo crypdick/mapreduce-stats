@@ -10,26 +10,38 @@ class VarianceElectricityCost(MRJob):
     Variance formula is E[X^2] - E[X]^2
 
     Output:
-    "Variance"	6.514557862360633
+    "Variance"	71.3836895496527
     '''
     def mapper(self, _, line):
         _, cost = line.split(',')
         # Electricity : State, Price per Kilowatt Hour
         #try:
-        yield ('Cost', float(cost))
+        cost = float(cost)
+        yield ('bucket', (cost, cost**2, 1))
         #except ValueError:  # some empty fields
          #   pass
+
+    def combiner(self, key, values):
+        n = 0
+        sum_x_squared = 0
+        sum_x = 0
+        for cost, costsq, count in values:
+            n += count
+            sum_x += cost
+            sum_x_squared += costsq
+
+        yield ("bucket", (sum_x, sum_x_squared, n))
 
     def reducer(self, key, values):
         n = 0
         sum_x_squared = 0
         sum_x = 0
-        for v in values:
-            n += 1
-            sum_x += v
-            sum_x_squared += v**2
+        for sum_cost, sum_costsq, count in values:
+            n += count
+            sum_x += sum_cost
+            sum_x_squared += sum_costsq
 
-        variance = sum_x_squared/n - (sum_x/n)**2 #TODO n should be squared for (E[x])^2
+        variance = sum_x_squared/n - (sum_x/n**2)**2
         yield ("Variance", variance)
 
 if __name__ == '__main__':
