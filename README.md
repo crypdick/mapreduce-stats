@@ -26,6 +26,7 @@ Note: For some of these problems, it may be helpful to run multiple map-reduce j
 
 Population = Area * alpha + beta
   
+ 
 That is, find alpha and beta that minimize the squared residuals when the state data is represented using this model
 
 4. Which of the following linear models is a better fit for the electricity data
@@ -42,3 +43,27 @@ Or
 
 - Each public college is equally likely to be sampled and each private college is equally likely to be sampled.
 - The sample is weighted so that in expectation there are the same number of public and private colleges in the sample
+
+class notes
+---
+price = alpha + beta* population
+
+beta = sum((pop-mean(pop))(price-mean(price))) / (var(pop)*n)
+alpha = price_bar - beta*pop_bar
+
+run map-reduce to compute pop_bar, price_bar, var(pop)
+
+
+---
+file1
+state, price
+
+file2
+state, population
+
+setup sep mapper for each file, they output same key but different values. (state, "price", price) and (state, "pop", population)
+
+TODO: example code for feeding two files to two mappers in mrstep job
+
+
+
