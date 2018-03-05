@@ -18,7 +18,11 @@ class RandSample100(MRJob):
             yield ('_', line)
 
     def reducer(self, key, values):
-        yield ('Uniformly sampled colleges: ', values)
+        total_samples = 0
+        for value in values:
+            total_samples +=1
+            yield ('Uniformly sampled college: ', value)
+        yield ('Total samples: ', total_samples)
 
 if __name__ == '__main__':
     RandSample100.run()
