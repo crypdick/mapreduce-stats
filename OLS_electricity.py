@@ -8,7 +8,8 @@ from numpy.random import choice
 class MrLeastSquares(MRJob):
     '''
     Run with:
-    python OLS_electricity.py < Data/states.csv
+    cat Data/Electricity.csv Data/states.csv | python OLS_electricity.py
+
 
     Which of the following linear models is a better fit for the electricity data
 
@@ -19,7 +20,8 @@ class MrLeastSquares(MRJob):
     Electricity Price = Population * alpha + beta
 
     Output:
-    "Weighted average of linear regression coefficients: "	[-4.921647793626868, 5496240.323258571]
+    "R^2 for population_model: "	0.03973107440392354
+    "R^2 for area_model: "	-0.12343404212845122
     '''
 
     state_to_bucket = {}
@@ -103,11 +105,9 @@ class MrLeastSquares(MRJob):
         if model_type == 'area_model':
             self.area_model_prices.extend(prices)
             self.area_model_predictors.extend(predictor)
-            print('area saved')
         elif model_type == 'population_model':
             self.population_model_predictors.extend(predictor)
             self.population_model_prices.extend(prices)
-            print('population data saved')
         else:
             raise Exception
 
@@ -146,7 +146,7 @@ class MrLeastSquares(MRJob):
 
 
         # convert to list to get around np.array JSON serialization exception
-        yield ("R^2 for {} model: ".format(model_type), score)
+        yield ("R^2 for {}: ".format(model_type), score)
 
     def fix_list(self, my_list):
         '''
