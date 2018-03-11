@@ -1,4 +1,3 @@
-# 2. Calculate the variance in electricity prices among the states.
 from mrjob.job import MRJob
 from mrjob.step import MRStep
 from sklearn.linear_model import LinearRegression
@@ -17,7 +16,7 @@ class MrLeastSquares(MRJob):
     State data format: Name, Abbreviation, Area (Sq. Miles), Population
 
     Output:
-    "Variance"	71.3836895496527
+    "Weighted average of linear regression coefficients: "	[-4.921647793626868, 5496240.323258571]
     '''
 
     def steps(self):

@@ -33,6 +33,12 @@ Population = Area * alpha + beta
  
 That is, find alpha and beta that minimize the squared residuals when the state data is represented using this model
 
+alpha = -4.921647793626868
+beta = 5496240.323258571
+
+See distributed_OLS.py
+
+
 4. Which of the following linear models is a better fit for the electricity data
 
   Electricity Price = Area * alpha + beta
