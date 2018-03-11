@@ -41,7 +41,7 @@ class MrLeastSquares(MRJob):
         if len(words) == 5:  # reading from states.csv
             _, _, _, area, population = words
             print(state, area, population)
-            yield (state, tuple(int(area), int(population)))
+            yield (state, (int(area), int(population)))
             # use int to solve serialization exception
             # https://stackoverflow.com/a/11942689/4212158
             #bucket_id = int(choice(range(5)))
@@ -59,11 +59,13 @@ class MrLeastSquares(MRJob):
             #price, area, population = None, None, None
             if isinstance(vals, float):
                 price = vals
-                yield ("population_model" + bucket_id, ("price", price))
-                yield ("area_model" + bucket_id, ("price", price))
-            elif isinstance(vals, tuple):
-                yield ("population_model" + bucket_id, ("area + pop", vals))
-                yield ("area_model" + bucket_id, ("area + pop", vals))
+                yield ("population_model" + bucket_id, (state_name, "price", price))
+                yield ("area_model" + bucket_id, (state_name, "price", price))
+            # lesson learned: MrJob turns tuples into lists...
+            elif isinstance(vals, list):
+                area, population = vals
+                yield ("population_model" + bucket_id, (state_name, "predictor", population))
+                yield ("area_model" + bucket_id, (state_name, "predictor", area))
             else:
                 print(vals, type(vals))
                 raise Exception
@@ -72,15 +74,37 @@ class MrLeastSquares(MRJob):
 
 
     def regression_reducer(self, bucket_id, values):
-        for v in values:
-
+        data = {}
         model_type = bucket_id[:-1]  # drop number
-        predictor, price = zip(*values)
-        n_samples_this_reducer = len(price)
+
+
+        for tup in values:
+            state_name = tup[0]
+
+            if state_name not in data:
+                data[state_name] = {'price': None,
+                                    'predictor': None}
+
+            if tup[1] == 'price':
+                data[state_name]['price'] = tup[2]
+            elif tup[1] == 'predictor':
+                data[state_name]['predictor'] = tup[2]
+
+        prices = []
+        predictor = []
+        for _, dicti in data.items():
+            for k, v in dicti.items():
+                if k == 'price':
+                    prices.append(v)
+                else:
+                    predictor.append(v)
+        print('done')
+
+        n_samples_this_reducer = len(prices)
         # make compatible shape for scikit
-        predictor, price = np.array(predictor).reshape(-1, 1),\
-                             np.array(price).reshape(-1, 1),
-        lin_model = LinearRegression(fit_intercept=True).fit(predictor, price)
+        predictor, prices = np.array(predictor).reshape(-1, 1),\
+                             np.array(prices).reshape(-1, 1),
+        lin_model = LinearRegression(fit_intercept=True).fit(predictor, prices)
         alpha = lin_model.coef_[0][0]  # extract alpha from array
         intercept = lin_model.intercept_[0]
         yield (model_type, ([alpha, intercept], n_samples_this_reducer))
