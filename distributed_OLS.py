@@ -20,16 +20,20 @@ class MrLeastSquares(MRJob):
     '''
     def mapper(self, _, line):
         words = line.split(',')
-        _, _, _, area, population = words
+        _state, _, _, area, population = words
         # use int to solve serialization exception
         # https://stackoverflow.com/a/11942689/4212158
         bucket_id = int(choice(range(5)))
-        yield (bucket_id, (int(area), int(population)))
+        try:
+            yield (bucket_id, (int(area), int(population)))
+        except ValueError:
+            # there are some bs entries at the tail of the csv
+            # solve by deleting them
+            print(_state, area, population)
 
     def reducer(self, bucked_id, values):
         areas, populations = zip(*values)
-        print("areas ", areas)
-        print("pop", populations)
+        # make compatible with scikit
         areas, populations = np.array(areas).reshape(-1, 1),\
                              np.array(populations).reshape(-1, 1),
         #areas, populations = areas.reshape(-1, 1), populations.reshape(-1, 1)
