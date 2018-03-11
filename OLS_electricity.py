@@ -21,42 +21,59 @@ class MrLeastSquares(MRJob):
     Output:
     "Weighted average of linear regression coefficients: "	[-4.921647793626868, 5496240.323258571]
     '''
+    state_to_bucket = {}
 
     def steps(self):
-        return [MRStep(mapper=self.mapper_parse_csvs,
+        return [MRStep(
+                       mapper=self.mapper_parse_csvs,
                        reducer=self.reducer_join_data),
                 MRStep(reducer=self.regression_reducer),
                 MRStep(reducer=self.average_coeffs_reducer)]
 
     def mapper_parse_csvs(self, _, line):
         words = line.split(',')
+
+        state = words[0]
+        if state not in self.state_to_bucket:
+            bucket_id = str(choice(range(5)))
+            self.state_to_bucket[state] = bucket_id
+
         if len(words) == 5:  # reading from states.csv
-            state, _, _, area, population = words
-            print(state, (area, population))
-            yield (state, (int(area), int(population)))
+            _, _, _, area, population = words
+            print(state, area, population)
+            yield (state, tuple(int(area), int(population)))
             # use int to solve serialization exception
             # https://stackoverflow.com/a/11942689/4212158
             #bucket_id = int(choice(range(5)))
             #try:
              #   yield (bucket_id, (int(area), int(population)))
         elif len(words) == 2:  # reading from electricity.csv
-            state, price = words
+            _, price = words
             print(state, price)
             yield (state, float(price))
 
     def reducer_join_data(self, state_name, data):
-        for vals in data:
-            if isinstance(data, float):
-                price = data
-            elif isinstance(data, tuple):
-                area, population = data
+        bucket_id = self.state_to_bucket[state_name]
 
-        bucket_id = str(choice(range(5)))
-        yield ("area_model"+bucket_id, (area, price))
-        yield ("population_model"+bucket_id, (population, price))
+        for vals in data:
+            #price, area, population = None, None, None
+            if isinstance(vals, float):
+                price = vals
+                yield ("population_model" + bucket_id, ("price", price))
+                yield ("area_model" + bucket_id, ("price", price))
+            elif isinstance(vals, tuple):
+                yield ("population_model" + bucket_id, ("area + pop", vals))
+                yield ("area_model" + bucket_id, ("area + pop", vals))
+            else:
+                print(vals, type(vals))
+                raise Exception
+
+
 
 
     def regression_reducer(self, bucket_id, values):
+        for v in values:
+
         model_type = bucket_id[:-1]  # drop number
         predictor, price = zip(*values)
         n_samples_this_reducer = len(price)
