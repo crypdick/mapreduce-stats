@@ -48,6 +48,7 @@ Or
   Electricity Price = Population * alpha + beta
 
 
+The R^2 for population_model is 0.03973107440392354, whereas the R^2 for area_model is -0.12343404212845122. I did not know it was possible to get a negative R^2. But as I expected, the electricity price is better predicted by population than by area.
 
 5. Obtain a random sample of approximately 100 colleges, in which each college is equally likely to appear in the sample.
 
@@ -66,18 +67,5 @@ beta = sum((pop-mean(pop))(price-mean(price))) / (var(pop)*n)
 alpha = price_bar - beta*pop_bar
 
 run map-reduce to compute pop_bar, price_bar, var(pop)
-
-
----
-file1
-state, price
-
-file2
-state, population
-
-setup sep mapper for each file, they output same key but different values. (state, "price", price) and (state, "pop", population)
-
-TODO: example code for feeding two files to two mappers in mrstep job
-
 
 
