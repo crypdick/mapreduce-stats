@@ -21,6 +21,7 @@ class MrLeastSquares(MRJob):
     Output:
     "Weighted average of linear regression coefficients: "	[-4.921647793626868, 5496240.323258571]
     '''
+
     state_to_bucket = {}
     area_model_prices = []
     area_model_predictors = []
@@ -113,8 +114,7 @@ class MrLeastSquares(MRJob):
         n_samples_this_reducer = len(prices)
 
         # make compatible shape for scikit
-        predictor, prices = np.array(predictor).reshape(-1, 1), \
-                            np.array(prices).reshape(-1, 1),
+        predictor, prices = self.fix_list(predictor), self.fix_list(prices)
         lin_model = LinearRegression(fit_intercept=True).fit(predictor, prices)
         alpha = lin_model.coef_[0][0]  # extract alpha from array
         intercept = lin_model.intercept_[0]
@@ -129,10 +129,11 @@ class MrLeastSquares(MRJob):
         coeff_weighted_avg = np.average(coefficients, weights=num_samples,
                                         axis=0)
 
-        print(coeff_weighted_avg)
-        #print('pos', LinearRegression(fit_intercept=True).get_params().keys())
         combined_lm = LinearRegression(fit_intercept=True)
-        combined_lm.coef_ = coeff_weighted_avg  # this may or may not be cheating
+
+        # coef and intercept are stored seperately
+        combined_lm.coef_ = coeff_weighted_avg[0]  # this may or may not be cheating
+        combined_lm.intercept_ = coeff_weighted_avg[1]
 
         if model_type == 'population_model':
             x = self.population_model_predictors
@@ -140,13 +141,19 @@ class MrLeastSquares(MRJob):
         elif model_type == 'area_model':
             x = self.area_model_predictors
             y = self.area_model_prices
-        #print('x',  x)
-        score = combined_lm.score(x,y)
+        score = combined_lm.score(self.fix_list(x),self.fix_list(y))
 
 
 
         # convert to list to get around np.array JSON serialization exception
         yield ("R^2 for {} model: ".format(model_type), score)
+
+    def fix_list(self, my_list):
+        '''
+        converts lists into a format which scipy linearRegression model can
+        understand
+        '''
+        return np.array(my_list).reshape(-1, 1)
 
 
 if __name__ == '__main__':
