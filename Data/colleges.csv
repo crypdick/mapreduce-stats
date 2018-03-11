@@ -1,4 +1,3 @@
-College Name,State,Public (1)/ Private (2),Math SAT,Verbal SAT,ACT,# appli. rec'd,# appl. accepted,# new stud. enrolled,% new stud. from top 10%,% new stud. from top 25%,# FT undergrad,# PT undergrad,in-state tuition,out-of-state tuition,room,board,add. fees,estim. book costs,estim. personal $,% fac. w/PHD,stud./fac. ratio,Graduation rate
 Alaska Pacific University,AK,2,490,482,20,193,146,55,16,44,249,869,7560,7560,1620,2500,130,800,1500,76,11.9,15
 University of Alaska at Fairbanks,AK,1,499,462,22,1852,1427,928,,,3885,4519,1742,5226,1800,1790,155,650,2304,67,10,
 University of Alaska Southeast,AK,1,,,,146,117,89,4,24,492,1849,1742,5226,2514,2250,34,500,1162,39,9.5,39
@@ -639,7 +638,7 @@ College of Great Falls,MT,2,,,,394,394,268,,,700,537,5100,5100,990,890,140,400,,
 Montana State University-Billings,MT,1,,,,931,912,596,7,23,2482,868,2142,5866,1900,1400,60,600,2000,70,18.5,40
 Montana College of Mineral Sci. & Tech.       MT,MT,1,575,481,22,572,544,320,45,72,1470,416,2013,6073,1260,2140,,550,1400,71,16.4,74
 Montana State University,MT,1,520,440,23,3500,2836,1779,15,42,8730,993,1576,5552,3710,,648,550,2300,75,17.6,37
-"Montana State University, Northern",MT,1,,,,840,840,611,8,12,1169,403,3542,5879,,,,550,1200,20,10.6,
+"Montana State University Northern",MT,1,,,,840,840,611,8,12,1169,403,3542,5879,,,,550,1200,20,10.6,
 Rocky Mountain College,MT,2,444,426,21,560,392,270,11,31,743,118,8734,8734,1966,1396,85,600,625,56,11.3,68
 University of Montana,MT,1,489,457,22,3314,2809,1563,,,7754,1388,2251,6311,,,,550,,75,21.7,30
 Western Montana College,MT,1,,,19,376,256,256,,,816,1070,1935,5658,,3000,,475,,50,16.4,59
