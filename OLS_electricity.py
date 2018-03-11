@@ -22,10 +22,10 @@ class MrLeastSquares(MRJob):
     "Weighted average of linear regression coefficients: "	[-4.921647793626868, 5496240.323258571]
     '''
     state_to_bucket = {}
-    area_model_prices = None
-    area_model_predictors = None
-    population_model_prices = None
-    population_model_predictors = None
+    area_model_prices = []
+    area_model_predictors = []
+    population_model_prices = []
+    population_model_predictors = []
 
 
     def steps(self):
@@ -98,13 +98,17 @@ class MrLeastSquares(MRJob):
                 else:
                     predictor.append(v)
 
-        # store data to score them later
-        if model_type == 'area':
-            self.area_model_prices = prices
-            self.area_model_predictors = predictor
+        # store data for scoring later
+        if model_type == 'area_model':
+            self.area_model_prices.extend(prices)
+            self.area_model_predictors.extend(predictor)
+            print('area saved')
+        elif model_type == 'population_model':
+            self.population_model_predictors.extend(predictor)
+            self.population_model_prices.extend(prices)
+            print('population data saved')
         else:
-            self.population_model_predictors = predictor
-            self.population_model_prices = prices
+            raise Exception
 
         n_samples_this_reducer = len(prices)
 
@@ -125,10 +129,24 @@ class MrLeastSquares(MRJob):
         coeff_weighted_avg = np.average(coefficients, weights=num_samples,
                                         axis=0)
 
+        print(coeff_weighted_avg)
+        #print('pos', LinearRegression(fit_intercept=True).get_params().keys())
+        combined_lm = LinearRegression(fit_intercept=True)
+        combined_lm.coef_ = coeff_weighted_avg  # this may or may not be cheating
+
+        if model_type == 'population_model':
+            x = self.population_model_predictors
+            y = self.population_model_prices
+        elif model_type == 'area_model':
+            x = self.area_model_predictors
+            y = self.area_model_prices
+        #print('x',  x)
+        score = combined_lm.score(x,y)
+
 
 
         # convert to list to get around np.array JSON serialization exception
-        yield ("R^2 for {} model: ".format(model_type), list(coeff_weighted_avg))
+        yield ("R^2 for {} model: ".format(model_type), score)
 
 
 if __name__ == '__main__':
