@@ -8,7 +8,7 @@ from numpy.random import choice
 class MrLeastSquares(MRJob):
     '''
     Run with:
-    python distributed_OLS.py < Data/states.csv
+    python OLS_states.py < Data/states.csv
 
     fit Population = Area * alpha + beta
 

@@ -36,7 +36,7 @@ That is, find alpha and beta that minimize the squared residuals when the state 
 alpha = -4.921647793626868
 beta = 5496240.323258571
 
-See distributed_OLS.py
+See OLS_states.py
 
 
 4. Which of the following linear models is a better fit for the electricity data
@@ -46,6 +46,8 @@ See distributed_OLS.py
 Or
 
   Electricity Price = Population * alpha + beta
+
+
 
 5. Obtain a random sample of approximately 100 colleges, in which each college is equally likely to appear in the sample.
 
